@@ -103,7 +103,6 @@ const GlobalStyles = () => (
 
     /* Hamburger */
     .hamburger {
-      display: none !important;
       flex-direction: column; justify-content: center; gap: 5px;
       width: 36px; height: 36px;
       background: none; border: none; cursor: pointer;
@@ -117,6 +116,27 @@ const GlobalStyles = () => (
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-nav-link {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--muted);
+      padding: 10px 14px; border-radius: 6px;
+      cursor: pointer; border: none; background: none;
+      text-align: left; width: 100%;
+      transition: color 0.2s, background 0.2s;
+    }
+    .mobile-nav-link:hover { color: var(--text); background: var(--border); }
+    .mobile-nav-link.active { color: var(--accent-dk); background: rgba(74,222,128,0.1); }
+    .mobile-menu-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; margin-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-menu-footer span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem; color: var(--muted);
+    }
 
     /* Mobile menu */
     .mobile-menu {
@@ -794,10 +814,17 @@ export default function App() {
   const [page, setPage] = useState("home");
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
 
   useEffect(() => {
     document.body.classList.toggle("dark", dark);
   }, [dark]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 640);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const navigate = (p) => {
     setPage(p);
@@ -807,57 +834,67 @@ export default function App() {
   return (
     <>
       <GlobalStyles />
-      <nav className="navbar">
+      <nav className="navbar" style={{ padding: isMobile ? "0 1.5rem" : "0 2.5rem" }}>
         <div className="nav-logo" onClick={() => navigate("home")}>
           zach.benedetti <span className="cursor" />
         </div>
-        <div className="nav-links">
+
+        {/* Desktop links */}
+        {!isMobile && (
+          <div className="nav-links">
+            {PAGES.filter(p => p !== "home").map(p => (
+              <button key={p} className={`nav-link${page === p ? " active" : ""}`} onClick={() => navigate(p)}>
+                {PAGE_LABELS[p]}
+              </button>
+            ))}
+            <button
+              className={`dark-toggle${dark ? " on" : ""}`}
+              onClick={() => setDark(d => !d)}
+              title="Toggle dark mode"
+            />
+          </div>
+        )}
+
+        {/* Mobile: dark toggle + hamburger */}
+        {isMobile && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <button
+              className={`dark-toggle${dark ? " on" : ""}`}
+              onClick={() => setDark(d => !d)}
+              title="Toggle dark mode"
+            />
+            <button
+              className={`hamburger${menuOpen ? " open" : ""}`}
+              style={{ display: "flex" }}
+              onClick={() => setMenuOpen(o => !o)}
+            >
+              <span /><span /><span />
+            </button>
+          </div>
+        )}
+      </nav>
+
+      {/* Mobile dropdown menu */}
+      {isMobile && menuOpen && (
+        <div style={{
+          position: "fixed", top: "var(--nav-h)", left: 0, right: 0,
+          background: "var(--bg)",
+          borderBottom: "1px solid var(--border)",
+          padding: "1rem 2rem 1.5rem",
+          display: "flex", flexDirection: "column", gap: "0.25rem",
+          zIndex: 99,
+        }}>
           {PAGES.filter(p => p !== "home").map(p => (
-            <button key={p} className={`nav-link${page === p ? " active" : ""}`} onClick={() => navigate(p)}>
+            <button
+              key={p}
+              className={`mobile-nav-link${page === p ? " active" : ""}`}
+              onClick={() => navigate(p)}
+            >
               {PAGE_LABELS[p]}
             </button>
           ))}
-          <button
-            className={`dark-toggle${dark ? " on" : ""}`}
-            onClick={() => setDark(d => !d)}
-            title="Toggle dark mode"
-          />
         </div>
-        <button
-          className={`hamburger${menuOpen ? " open" : ""}`}
-          onClick={() => setMenuOpen(o => !o)}
-        >
-          <span /><span /><span />
-        </button>
-      </nav>
-
-      <div style={{
-        display: menuOpen ? "flex" : "none",
-        position: "fixed", top: "var(--nav-h)", left: 0, right: 0,
-        background: "var(--bg)",
-        borderBottom: "1px solid var(--border)",
-        padding: "1rem 2rem 1.5rem",
-        flexDirection: "column", gap: "0.25rem",
-        zIndex: 99,
-      }}>
-        {PAGES.filter(p => p !== "home").map(p => (
-          <button
-            key={p}
-            className={`mobile-nav-link${page === p ? " active" : ""}`}
-            onClick={() => navigate(p)}
-          >
-            {PAGE_LABELS[p]}
-          </button>
-        ))}
-        <div className="mobile-menu-footer">
-          <span>dark mode</span>
-          <button
-            className={`dark-toggle${dark ? " on" : ""}`}
-            onClick={() => setDark(d => !d)}
-            title="Toggle dark mode"
-          />
-        </div>
-      </div>
+      )}
 
       {page === "home"     && <HomePage navigate={navigate} />}
       {page === "projects" && <ProjectsPage />}
