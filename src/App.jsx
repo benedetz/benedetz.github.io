@@ -522,7 +522,15 @@ function ResumePage() {
         <div className="section-label fade-in">CV</div>
         <h2 className="fade-in" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
           Resume
-          <button className="btn-secondary" style={{ fontSize: "0.78rem", padding: "7px 16px" }}>Download PDF ↓</button>
+          <a
+          
+            href="/resume.pdf"
+            download="Zach_Benedetti_Resume.pdf"
+            className="btn-secondary"
+            style={{ fontSize: "0.78rem", padding: "7px 16px", textDecoration: "none" }}
+          >
+            Download PDF ↓
+          </a>
         </h2>
 
         <div className="resume-section fade-in">
@@ -557,7 +565,7 @@ function ResumePage() {
         <div className="resume-section fade-in fade-in-delay-2">
           <h3>Skills</h3>
           <div className="tech-stack" style={{ marginTop: "0.5rem" }}>
-            {["TypeScript", "JavaScript", "React", "Node.js", "Go", "Python", "PostgreSQL", "Redis", "Docker", "AWS", "GitHub Actions", "Figma"].map(s => (
+            {["React.js", "Python", "C#/.NET Core 8", "JavaScript", "SQL", "C/C++", "Visual Studio", "VS Code", "Azure", "GCP", "Figma"].map(s => (
               <span className="tech-badge" key={s}>{s}</span>
             ))}
           </div>
@@ -592,66 +600,61 @@ function StatsPage() {
     <div className="page">
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "5rem 2.5rem" }}>
 
-        {/* Header */}
         <div className="section-label fade-in">Metrics</div>
-        <h2 className="fade-in" style={{ fontSize: "1.9rem", fontWeight: 600, letterSpacing: "-0.02em", marginBottom: "3rem" }}>
+        <h2 className="fade-in" style={{ fontSize: "1.9rem", fontWeight: 600, letterSpacing: "-0.02em", marginBottom: "2.5rem" }}>
           Stats & Dashboard
         </h2>
 
-        {/* Stat cards */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-          gap: "1.25rem",
-          marginBottom: "4rem"
-        }}>
-          {stats.map((s, i) => (
-            <div
-              className="stat-card fade-in"
-              key={s.label}
-              style={{ animationDelay: `${i * 0.07}s` }}
-            >
-              <span className="stat-value">{s.value}</span>
-              <span className="stat-label">{s.label}</span>
-            </div>
-          ))}
-        </div>
+        {/* Two-column layout: stats grid left, language bars right */}
+        <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: "3rem", alignItems: "start" }}>
 
-        {/* Languages section */}
-        <div className="section-label fade-in">Languages</div>
-        <h3 className="fade-in" style={{
-          fontSize: "1.2rem", fontWeight: 600,
-          marginBottom: "2rem", marginTop: "0.4rem"
-        }}>
-          Top languages by usage
-        </h3>
-
-        {/* Bars — centered, max width, full bleed on mobile */}
-        <div style={{ maxWidth: 560, width: "100%" }}>
-          {langs.map((l, i) => (
-            <div
-              className="lang-bar-row fade-in"
-              key={l.name}
-              style={{ animationDelay: `${i * 0.1}s`, marginBottom: "1.25rem" }}
-            >
-              <div className="lang-bar-label" style={{ marginBottom: "7px" }}>
-                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.85rem" }}>
-                  {l.name}
-                </span>
-                <span style={{ color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.85rem" }}>
-                  {l.pct}%
-                </span>
-              </div>
-              <div className="lang-bar-track" style={{ height: 10, borderRadius: 6 }}>
+          {/* Left: 3x2 stat cards */}
+          <div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "1rem",
+            }}>
+              {stats.map((s, i) => (
                 <div
-                  className="lang-bar-fill"
-                  style={{ width: loaded ? `${l.pct}%` : "0%", borderRadius: 6 }}
-                />
-              </div>
+                  className="stat-card fade-in"
+                  key={s.label}
+                  style={{ animationDelay: `${i * 0.07}s`, padding: "1.25rem 1rem" }}
+                >
+                  <span className="stat-value" style={{ fontSize: "1.5rem" }}>{s.value}</span>
+                  <span className="stat-label" style={{ fontSize: "0.75rem" }}>{s.label}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
 
+          {/* Right: language bars */}
+          <div className="fade-in fade-in-delay-2">
+            <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.75rem", color: "var(--accent-dk)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ display: "block", width: 16, height: 1.5, background: "var(--accent)" }} />
+              Languages
+            </p>
+            {langs.map((l, i) => (
+              <div
+                className="lang-bar-row fade-in"
+                key={l.name}
+                style={{ animationDelay: `${i * 0.1}s`, marginBottom: "1.25rem" }}
+              >
+                <div className="lang-bar-label" style={{ marginBottom: "7px" }}>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.82rem" }}>{l.name}</span>
+                  <span style={{ color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.82rem" }}>{l.pct}%</span>
+                </div>
+                <div className="lang-bar-track" style={{ height: 10, borderRadius: 6 }}>
+                  <div
+                    className="lang-bar-fill"
+                    style={{ width: loaded ? `${l.pct}%` : "0%", borderRadius: 6 }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
       </div>
     </div>
   );
@@ -659,6 +662,18 @@ function StatsPage() {
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async () => {
+    const res = await fetch("https://formspree.io/f/xvzvelod", {  
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ name, email, message }),
+    });
+    if (res.ok) setSent(true);
+  };
 
   return (
     <div className="page">
@@ -674,17 +689,17 @@ function ContactPage() {
               <div className="contact-form">
                 <div className="form-group">
                   <label className="form-label">Name</label>
-                  <input className="form-input" placeholder="Your name" />
+                  <input className="form-input" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Email</label>
-                  <input className="form-input" placeholder="you@email.com" type="email" />
+                  <input className="form-input" placeholder="you@email.com" type="email" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Message</label>
-                  <textarea className="form-textarea" placeholder="What's on your mind?" />
+                  <textarea className="form-textarea" placeholder="What's on your mind?" value={message} onChange={e => setMessage(e.target.value)} />
                 </div>
-                <button className="btn-primary" style={{ alignSelf: "flex-start" }} onClick={() => setSent(true)}>Send message →</button>
+                <button className="btn-primary" style={{ alignSelf: "flex-start" }} onClick={handleSubmit}>Send message →</button>
               </div>
             ) : (
               <div style={{ padding: "2rem", background: "var(--surface)", border: "1px solid var(--accent)", borderRadius: 12 }}>
