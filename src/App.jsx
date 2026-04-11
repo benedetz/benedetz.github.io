@@ -101,6 +101,62 @@ const GlobalStyles = () => (
     }
     .dark-toggle.on::after { transform: translateX(16px); }
 
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column; justify-content: center; gap: 5px;
+      width: 36px; height: 36px;
+      background: none; border: none; cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block; height: 2px; width: 22px;
+      background: var(--text); border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed; top: var(--nav-h); left: 0; right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem 1.5rem;
+      flex-direction: column; gap: 0.25rem;
+      z-index: 99;
+      transition: background 0.3s;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-nav-link {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--muted);
+      padding: 10px 14px; border-radius: 6px;
+      cursor: pointer; border: none; background: none;
+      text-align: left;
+      transition: color 0.2s, background 0.2s;
+    }
+    .mobile-nav-link:hover { color: var(--text); background: var(--border); }
+    .mobile-nav-link.active { color: var(--accent-dk); background: rgba(74,222,128,0.1); }
+    .mobile-menu-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; margin-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-menu-footer span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem; color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .navbar { padding: 0 1.5rem; }
+    }
+
     /* Page wrapper */
     .page { padding-top: var(--nav-h); min-height: 100vh; }
 
