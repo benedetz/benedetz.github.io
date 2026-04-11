@@ -148,7 +148,7 @@ const GlobalStyles = () => (
     }
     .mobile-menu-footer span {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.78rem; color: var(--muted);
+      font-size: 0.78rem; color: var(--muted); 
     }
 
     @media (max-width: 640px) {
