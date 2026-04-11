@@ -120,7 +120,6 @@ const GlobalStyles = () => (
 
     /* Mobile menu */
     .mobile-menu {
-      display: none;
       position: fixed; top: var(--nav-h); left: 0; right: 0;
       background: var(--bg);
       border-bottom: 1px solid var(--border);
@@ -129,14 +128,13 @@ const GlobalStyles = () => (
       z-index: 99;
       transition: background 0.3s;
     }
-    .mobile-menu.open { display: flex; }
     .mobile-nav-link {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.9rem; font-weight: 500;
       color: var(--muted);
       padding: 10px 14px; border-radius: 6px;
       cursor: pointer; border: none; background: none;
-      text-align: left;
+      text-align: left; width: 100%;
       transition: color 0.2s, background 0.2s;
     }
     .mobile-nav-link:hover { color: var(--text); background: var(--border); }
@@ -148,11 +146,11 @@ const GlobalStyles = () => (
     }
     .mobile-menu-footer span {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.78rem; color: var(--muted); 
+      font-size: 0.78rem; color: var(--muted);
     }
 
     @media (max-width: 640px) {
-      .nav-links { display: none; }
+      .nav-links { display: none !important; }
       .hamburger { display: flex; }
       .navbar { padding: 0 1.5rem; }
     }
@@ -795,12 +793,16 @@ const PAGE_LABELS = { home: "~/", projects: "projects", about: "about", resume: 
 export default function App() {
   const [page, setPage] = useState("home");
   const [dark, setDark] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     document.body.classList.toggle("dark", dark);
   }, [dark]);
 
-  const navigate = (p) => setPage(p);
+  const navigate = (p) => {
+    setPage(p);
+    setMenuOpen(false);
+  };
 
   return (
     <>
@@ -821,7 +823,42 @@ export default function App() {
             title="Toggle dark mode"
           />
         </div>
+        <button
+          className={`hamburger${menuOpen ? " open" : ""}`}
+          onClick={() => setMenuOpen(o => !o)}
+        >
+          <span /><span /><span />
+        </button>
       </nav>
+
+      {/* Mobile menu — visibility controlled by React, not CSS class */}
+      <div style={{
+        display: menuOpen ? "flex" : "none",
+        position: "fixed", top: "var(--nav-h)", left: 0, right: 0,
+        background: "var(--bg)",
+        borderBottom: "1px solid var(--border)",
+        padding: "1rem 2rem 1.5rem",
+        flexDirection: "column", gap: "0.25rem",
+        zIndex: 99,
+      }}>
+        {PAGES.filter(p => p !== "home").map(p => (
+          <button
+            key={p}
+            className={`mobile-nav-link${page === p ? " active" : ""}`}
+            onClick={() => navigate(p)}
+          >
+            {PAGE_LABELS[p]}
+          </button>
+        ))}
+        <div className="mobile-menu-footer">
+          <span>dark mode</span>
+          <button
+            className={`dark-toggle${dark ? " on" : ""}`}
+            onClick={() => setDark(d => !d)}
+            title="Toggle dark mode"
+          />
+        </div>
+      </div>
 
       {page === "home"     && <HomePage navigate={navigate} />}
       {page === "projects" && <ProjectsPage />}
