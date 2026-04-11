@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-// ── Palette & global styles injected via a <style> tag ──────────────────────
 const GlobalStyles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -38,20 +37,18 @@ const GlobalStyles = () => (
     }
     .mono { font-family: 'IBM Plex Mono', monospace; }
 
-    /* Dot-grid background texture */
     .dot-bg {
       background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
       background-size: 28px 28px;
     }
 
-    /* Navbar */
+    /* Navbar — no padding here, set via inline style in JSX */
     .navbar {
       position: fixed; top: 0; left: 0; right: 0;
       height: var(--nav-h);
       background: var(--bg);
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2.5rem;
       z-index: 100;
       backdrop-filter: blur(10px);
       transition: background 0.3s, border-color 0.3s;
@@ -90,6 +87,7 @@ const GlobalStyles = () => (
       border-radius: 100px; border: none; cursor: pointer;
       position: relative; transition: background 0.3s;
       margin-left: 1rem;
+      flex-shrink: 0;
     }
     .dark-toggle.on { background: var(--accent-dk); }
     .dark-toggle::after {
@@ -101,12 +99,13 @@ const GlobalStyles = () => (
     }
     .dark-toggle.on::after { transform: translateX(16px); }
 
-    /* Hamburger */
+    /* Hamburger — display controlled entirely by React, no CSS show/hide */
     .hamburger {
+      display: flex;
       flex-direction: column; justify-content: center; gap: 5px;
       width: 36px; height: 36px;
       background: none; border: none; cursor: pointer;
-      padding: 4px;
+      padding: 4px; flex-shrink: 0;
     }
     .hamburger span {
       display: block; height: 2px; width: 22px;
@@ -128,60 +127,10 @@ const GlobalStyles = () => (
     }
     .mobile-nav-link:hover { color: var(--text); background: var(--border); }
     .mobile-nav-link.active { color: var(--accent-dk); background: rgba(74,222,128,0.1); }
-    .mobile-menu-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; margin-top: 0.5rem;
-      border-top: 1px solid var(--border);
-    }
-    .mobile-menu-footer span {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.78rem; color: var(--muted);
-    }
 
-    /* Mobile menu */
-    .mobile-menu {
-      position: fixed; top: var(--nav-h); left: 0; right: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem 1.5rem;
-      flex-direction: column; gap: 0.25rem;
-      z-index: 99;
-      transition: background 0.3s;
-    }
-    .mobile-nav-link {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.9rem; font-weight: 500;
-      color: var(--muted);
-      padding: 10px 14px; border-radius: 6px;
-      cursor: pointer; border: none; background: none;
-      text-align: left; width: 100%;
-      transition: color 0.2s, background 0.2s;
-    }
-    .mobile-nav-link:hover { color: var(--text); background: var(--border); }
-    .mobile-nav-link.active { color: var(--accent-dk); background: rgba(74,222,128,0.1); }
-    .mobile-menu-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; margin-top: 0.5rem;
-      border-top: 1px solid var(--border);
-    }
-    .mobile-menu-footer span {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.78rem; color: var(--muted);
-    }
-
-    @media (max-width: 640px) {
-      .nav-links { display: none !important; }
-      .hamburger { display: flex !important; }
-      .navbar { padding: 0 1.5rem; }
-    }
-
-    /* Page wrapper */
     .page { padding-top: var(--nav-h); min-height: 100vh; }
 
-    /* Fade-slide animation */
-    .fade-in {
-      animation: fadeSlideUp 0.45s cubic-bezier(.22,.68,0,1.2) both;
-    }
+    .fade-in { animation: fadeSlideUp 0.45s cubic-bezier(.22,.68,0,1.2) both; }
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -191,7 +140,6 @@ const GlobalStyles = () => (
     .fade-in-delay-3 { animation-delay: 0.3s; }
     .fade-in-delay-4 { animation-delay: 0.45s; }
 
-    /* Hero */
     .hero {
       min-height: calc(100vh - var(--nav-h));
       display: flex; flex-direction: column;
@@ -213,27 +161,22 @@ const GlobalStyles = () => (
     .hero h1 {
       font-size: clamp(2.4rem, 6vw, 4rem);
       font-weight: 600; line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em; margin-bottom: 0.5rem;
     }
     .hero h1 .name { color: var(--accent-dk); }
     .typing-line {
       font-family: 'IBM Plex Mono', monospace;
       font-size: clamp(1rem, 2.5vw, 1.35rem);
-      color: var(--muted);
-      min-height: 2em;
-      margin-bottom: 1.75rem;
+      color: var(--muted); min-height: 2em; margin-bottom: 1.75rem;
     }
     .typing-cursor {
       display: inline-block; width: 2px; height: 1.1em;
       background: var(--accent); margin-left: 2px;
-      vertical-align: middle;
-      animation: blink 0.9s step-end infinite;
+      vertical-align: middle; animation: blink 0.9s step-end infinite;
     }
     .hero-desc {
       font-size: 1.05rem; color: var(--muted);
-      max-width: 520px; line-height: 1.7;
-      margin-bottom: 2.5rem;
+      max-width: 520px; line-height: 1.7; margin-bottom: 2.5rem;
     }
     .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; }
     .btn-primary {
@@ -257,7 +200,6 @@ const GlobalStyles = () => (
     }
     .btn-secondary:hover { border-color: var(--accent); color: var(--accent-dk); transform: translateY(-1px); }
 
-    /* Section */
     .section { max-width: 860px; margin: 0 auto; padding: 5rem 2.5rem; }
     .section-label {
       font-family: 'IBM Plex Mono', monospace;
@@ -267,26 +209,19 @@ const GlobalStyles = () => (
       display: flex; align-items: center; gap: 8px;
     }
     .section-label::before { content:''; display:block; width:16px; height:1.5px; background:var(--accent); }
-    .section h2 {
-      font-size: 1.9rem; font-weight: 600;
-      letter-spacing: -0.02em; margin-bottom: 2.5rem;
-    }
+    .section h2 { font-size: 1.9rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2.5rem; }
 
-    /* Project cards */
     .projects-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.25rem;
     }
     .project-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: var(--surface); border: 1px solid var(--border);
       border-radius: 12px; padding: 1.5rem;
-      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; cursor: pointer;
     }
     .project-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
+      border-color: var(--accent); transform: translateY(-3px);
       box-shadow: 0 8px 32px rgba(74,222,128,0.08);
     }
     .project-tag {
@@ -312,11 +247,9 @@ const GlobalStyles = () => (
     .tech-badge {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.68rem; color: var(--muted);
-      border: 1px solid var(--border); border-radius: 4px;
-      padding: 2px 7px;
+      border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px;
     }
 
-    /* About */
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
     @media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
     .about-text p { font-size: 0.97rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
@@ -331,7 +264,6 @@ const GlobalStyles = () => (
     .skill-item:hover { border-color: var(--accent); }
     .skill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
-    /* Resume */
     .resume-section { margin-bottom: 2.5rem; }
     .resume-section h3 {
       font-family: 'IBM Plex Mono', monospace;
@@ -347,12 +279,9 @@ const GlobalStyles = () => (
     .resume-company { font-size: 0.88rem; color: var(--accent-dk); margin-bottom: 0.4rem; }
     .resume-item p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
 
-    /* Stats */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
     .stat-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.5rem;
-      text-align: center;
+      border-radius: 12px; padding: 1.5rem; text-align: center;
       transition: border-color 0.2s, transform 0.2s;
     }
     .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
@@ -367,7 +296,6 @@ const GlobalStyles = () => (
     .lang-bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
     .lang-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width 1s cubic-bezier(.22,.68,0,1.2); }
 
-    /* Contact */
     .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
     @media (max-width: 640px) { .contact-grid { grid-template-columns: 1fr; } }
     .contact-form { display: flex; flex-direction: column; gap: 1rem; }
@@ -377,8 +305,7 @@ const GlobalStyles = () => (
       background: var(--surface); border: 1px solid var(--border);
       color: var(--text); border-radius: 8px;
       padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
-      outline: none; transition: border-color 0.2s;
-      width: 100%;
+      outline: none; transition: border-color 0.2s; width: 100%;
     }
     .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
     .form-textarea { min-height: 130px; resize: vertical; }
@@ -403,7 +330,6 @@ const GlobalStyles = () => (
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease infinite; }
     @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
 
-    /* Footer */
     .footer {
       border-top: 1px solid var(--border);
       padding: 2rem 2.5rem;
@@ -412,7 +338,6 @@ const GlobalStyles = () => (
     }
     .footer-mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--muted); }
 
-    /* Code block */
     .code-block {
       background: var(--code-bg); border-radius: 10px;
       padding: 1.25rem 1.5rem; margin: 1.5rem 0;
@@ -426,7 +351,6 @@ const GlobalStyles = () => (
   `}</style>
 );
 
-// ── Typing animation hook ────────────────────────────────────────────────────
 function useTyping(phrases, speed = 60, pause = 1800) {
   const [display, setDisplay] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
@@ -453,13 +377,11 @@ function useTyping(phrases, speed = 60, pause = 1800) {
   return display;
 }
 
-// ── Pages ────────────────────────────────────────────────────────────────────
-
 function HomePage({ navigate }) {
   const typed = useTyping([
     "I build things for the web.",
     "I love clean, fast interfaces.",
-    "I enjoy shipping impacful code.",
+    "I enjoy shipping impactful code.",
     "Using data for good.",
   ]);
 
@@ -480,7 +402,7 @@ function HomePage({ navigate }) {
           {typed}<span className="typing-cursor" />
         </div>
         <p className="hero-desc fade-in fade-in-delay-3">
-          I'm a full-stack engineer who cares about writing impactful code 
+          I'm a full-stack engineer who cares about writing impactful code
           to create a greater impact on the world. Based in Portland, OR.
         </p>
         <div className="btn-row fade-in fade-in-delay-4">
@@ -569,7 +491,7 @@ function AboutPage() {
             <p>I started coding in college building tiny tools to automate things I found tedious, and somewhere along the way it turned into a career. I've worked at a mid-size workers compensation insurance company, a student led startup, and I'm starting an internship with a riflescope company this summer.</p>
             <p>Outside of work I am very active in different sports and activities and I like meeting new people.</p>
             <p style={{ marginTop: "1.5rem" }}>
-              <button className="btn-primary" style={{ fontSize: "0.8rem", padding: "8px 18px" }}>Download Resume ↓</button>
+              <a href="/resume.pdf" download="Zach_Benedetti_Resume.pdf" className="btn-primary" style={{ fontSize: "0.8rem", padding: "8px 18px", textDecoration: "none" }}>Download Resume ↓</a>
             </p>
           </div>
           <div className="fade-in fade-in-delay-1">
@@ -596,13 +518,7 @@ function ResumePage() {
         <div className="section-label fade-in">CV</div>
         <h2 className="fade-in" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
           Resume
-          <a
-          
-            href="/resume.pdf"
-            download="Zach_Benedetti_Resume.pdf"
-            className="btn-secondary"
-            style={{ fontSize: "0.78rem", padding: "7px 16px", textDecoration: "none" }}
-          >
+          <a href="/resume.pdf" download="Zach_Benedetti_Resume.pdf" className="btn-secondary" style={{ fontSize: "0.78rem", padding: "7px 16px", textDecoration: "none" }}>
             Download PDF ↓
           </a>
         </h2>
@@ -673,61 +589,38 @@ function StatsPage() {
   return (
     <div className="page">
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "5rem 2.5rem" }}>
-
         <div className="section-label fade-in">Metrics</div>
         <h2 className="fade-in" style={{ fontSize: "1.9rem", fontWeight: 600, letterSpacing: "-0.02em", marginBottom: "2.5rem" }}>
           Stats & Dashboard
         </h2>
-
-        {/* Two-column layout: stats grid left, language bars right */}
         <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: "3rem", alignItems: "start" }}>
-
-          {/* Left: 3x2 stat cards */}
           <div>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "1rem",
-            }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
               {stats.map((s, i) => (
-                <div
-                  className="stat-card fade-in"
-                  key={s.label}
-                  style={{ animationDelay: `${i * 0.07}s`, padding: "1.25rem 1rem" }}
-                >
+                <div className="stat-card fade-in" key={s.label} style={{ animationDelay: `${i * 0.07}s`, padding: "1.25rem 1rem" }}>
                   <span className="stat-value" style={{ fontSize: "1.5rem" }}>{s.value}</span>
                   <span className="stat-label" style={{ fontSize: "0.75rem" }}>{s.label}</span>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Right: language bars */}
           <div className="fade-in fade-in-delay-2">
             <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.75rem", color: "var(--accent-dk)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ display: "block", width: 16, height: 1.5, background: "var(--accent)" }} />
               Languages
             </p>
             {langs.map((l, i) => (
-              <div
-                className="lang-bar-row fade-in"
-                key={l.name}
-                style={{ animationDelay: `${i * 0.1}s`, marginBottom: "1.25rem" }}
-              >
+              <div className="lang-bar-row fade-in" key={l.name} style={{ animationDelay: `${i * 0.1}s`, marginBottom: "1.25rem" }}>
                 <div className="lang-bar-label" style={{ marginBottom: "7px" }}>
                   <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.82rem" }}>{l.name}</span>
                   <span style={{ color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.82rem" }}>{l.pct}%</span>
                 </div>
                 <div className="lang-bar-track" style={{ height: 10, borderRadius: 6 }}>
-                  <div
-                    className="lang-bar-fill"
-                    style={{ width: loaded ? `${l.pct}%` : "0%", borderRadius: 6 }}
-                  />
+                  <div className="lang-bar-fill" style={{ width: loaded ? `${l.pct}%` : "0%", borderRadius: 6 }} />
                 </div>
               </div>
             ))}
           </div>
-
         </div>
       </div>
     </div>
@@ -741,7 +634,7 @@ function ContactPage() {
   const [message, setMessage] = useState("");
 
   const handleSubmit = async () => {
-    const res = await fetch("https://formspree.io/f/xvzvelod", {  
+    const res = await fetch("https://formspree.io/f/xvzvelod", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
       body: JSON.stringify({ name, email, message }),
@@ -806,7 +699,6 @@ function ContactPage() {
   );
 }
 
-// ── App shell ────────────────────────────────────────────────────────────────
 const PAGES = ["home", "projects", "about", "resume", "stats", "contact"];
 const PAGE_LABELS = { home: "~/", projects: "projects", about: "about", resume: "resume", stats: "stats", contact: "contact" };
 
@@ -814,14 +706,17 @@ export default function App() {
   const [page, setPage] = useState("home");
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
 
   useEffect(() => {
     document.body.classList.toggle("dark", dark);
   }, [dark]);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 640);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 640);
+      if (window.innerWidth > 640) setMenuOpen(false);
+    };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -834,12 +729,14 @@ export default function App() {
   return (
     <>
       <GlobalStyles />
+
+      {/* ── Navbar ── */}
       <nav className="navbar" style={{ padding: isMobile ? "0 1.5rem" : "0 2.5rem" }}>
         <div className="nav-logo" onClick={() => navigate("home")}>
           zach.benedetti <span className="cursor" />
         </div>
 
-        {/* Desktop links */}
+        {/* Desktop nav links */}
         {!isMobile && (
           <div className="nav-links">
             {PAGES.filter(p => p !== "home").map(p => (
@@ -847,49 +744,33 @@ export default function App() {
                 {PAGE_LABELS[p]}
               </button>
             ))}
-            <button
-              className={`dark-toggle${dark ? " on" : ""}`}
-              onClick={() => setDark(d => !d)}
-              title="Toggle dark mode"
-            />
+            <button className={`dark-toggle${dark ? " on" : ""}`} onClick={() => setDark(d => !d)} title="Toggle dark mode" />
           </div>
         )}
 
-        {/* Mobile: dark toggle + hamburger */}
+        {/* Mobile: toggle + hamburger */}
         {isMobile && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <button
-              className={`dark-toggle${dark ? " on" : ""}`}
-              onClick={() => setDark(d => !d)}
-              title="Toggle dark mode"
-            />
-            <button
-              className={`hamburger${menuOpen ? " open" : ""}`}
-              style={{ display: "flex" }}
-              onClick={() => setMenuOpen(o => !o)}
-            >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <button className={`dark-toggle${dark ? " on" : ""}`} onClick={() => setDark(d => !d)} title="Toggle dark mode" style={{ margin: 0 }} />
+            <button className={`hamburger${menuOpen ? " open" : ""}`} onClick={() => setMenuOpen(o => !o)}>
               <span /><span /><span />
             </button>
           </div>
         )}
       </nav>
 
-      {/* Mobile dropdown menu */}
+      {/* ── Mobile dropdown ── */}
       {isMobile && menuOpen && (
         <div style={{
           position: "fixed", top: "var(--nav-h)", left: 0, right: 0,
           background: "var(--bg)",
           borderBottom: "1px solid var(--border)",
-          padding: "1rem 2rem 1.5rem",
+          padding: "1rem 1.5rem 1.5rem",
           display: "flex", flexDirection: "column", gap: "0.25rem",
           zIndex: 99,
         }}>
           {PAGES.filter(p => p !== "home").map(p => (
-            <button
-              key={p}
-              className={`mobile-nav-link${page === p ? " active" : ""}`}
-              onClick={() => navigate(p)}
-            >
+            <button key={p} className={`mobile-nav-link${page === p ? " active" : ""}`} onClick={() => navigate(p)}>
               {PAGE_LABELS[p]}
             </button>
           ))}
