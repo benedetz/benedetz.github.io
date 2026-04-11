@@ -103,7 +103,7 @@ const GlobalStyles = () => (
 
     /* Hamburger */
     .hamburger {
-      display: none;
+      display: none !important;
       flex-direction: column; justify-content: center; gap: 5px;
       width: 36px; height: 36px;
       background: none; border: none; cursor: pointer;
@@ -151,7 +151,7 @@ const GlobalStyles = () => (
 
     @media (max-width: 640px) {
       .nav-links { display: none !important; }
-      .hamburger { display: flex; }
+      .hamburger { display: flex !important; }
       .navbar { padding: 0 1.5rem; }
     }
 
@@ -831,7 +831,6 @@ export default function App() {
         </button>
       </nav>
 
-      {/* Mobile menu — visibility controlled by React, not CSS class */}
       <div style={{
         display: menuOpen ? "flex" : "none",
         position: "fixed", top: "var(--nav-h)", left: 0, right: 0,
